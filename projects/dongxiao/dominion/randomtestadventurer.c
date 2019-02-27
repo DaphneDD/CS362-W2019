@@ -8,6 +8,26 @@
 #define DEBUG 0
 #define NOISY_TEST 1
 
+/********************************************************************************************
+ * Function: assertTrue
+ * Parameters: testResult: an int; expectedResult: an int; info: a string
+ * Description: If testResult is the same as expectedResult, then the "TEST SUCCESSFULLY 
+ * 		COMPLETED" will be displayed on stdout. Otherwise, "TEST FAILED" will be
+ * 		printed out. The message is followed by the testing conditions stated in info.
+ * *******************************************************************************************/
+void assertTrue(int testResult, int expectedResult, char* info)
+{
+	if (testResult == expectedResult)
+	{
+		printf("TEST SUCCESSFULLY COMPLETED: "); fflush(stdout);
+	}
+	else
+	{
+		printf("TEST FAILED: "); fflush(stdout);
+	}
+	printf(info);
+}
+
 int checkDrawCard(int p, struct gameState *post) {
   struct gameState pre;
   memcpy (&pre, post, sizeof(struct gameState));
@@ -40,35 +60,36 @@ int checkDrawCard(int p, struct gameState *post) {
 }
 
 int main () {
+	int i, n, r, p, deckCount, discardCount, handCount;
 
-  int i, n, r, p, deckCount, discardCount, handCount;
-
-  int k[10] = {adventurer, council_room, feast, gardens, mine,
+	int k[10] = {adventurer, council_room, feast, gardens, mine,
 	       remodel, smithy, village, baron, great_hall};
 
-  struct gameState G;
+	struct gameState G;
 
-  printf ("Testing drawCard.\n");
+	printf ("Testing drawCard.\n");
 
-  printf ("RANDOM TESTS.\n");
+	printf ("RANDOM TESTS.\n");
 
-  SelectStream(2);
-  PutSeed(3);
+	SelectStream(2);
+	PutSeed(3);
 
-  for (n = 0; n < 2000; n++) {
-    for (i = 0; i < sizeof(struct gameState); i++) {
-      ((char*)&G)[i] = floor(Random() * 256);
-    }
-    p = floor(Random() * 2);
-    G.deckCount[p] = floor(Random() * MAX_DECK);
-    G.discardCount[p] = floor(Random() * MAX_DECK);
-    G.handCount[p] = floor(Random() * MAX_HAND);
-    checkDrawCard(p, &G);
-  }
+	for (n = 0; n < 2000; n++) 
+	{
+		for (i = 0; i < sizeof(struct gameState); i++) 
+		{
+			((char*)&G)[i] = floor(Random() * 256);
+		}
+		p = floor(Random() * 2);
+		G.deckCount[p] = floor(Random() * MAX_DECK);
+		G.discardCount[p] = floor(Random() * MAX_DECK);
+		G.handCount[p] = floor(Random() * MAX_HAND);
+		checkDrawCard(p, &G);
+	}
 
-  printf ("ALL TESTS OK\n");
+	printf ("ALL TESTS OK\n");
 
-  exit(0);
+	exit(0);
 
   printf ("SIMPLE FIXED TESTS.\n");
   for (p = 0; p < 2; p++) {
