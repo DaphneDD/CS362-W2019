@@ -64,9 +64,13 @@ int checkAdventurer(int player, struct gameState *post) {
 	cardEffect(0,0,0,0,post,0,&bonus); //call the adventurerAction
 
 	//check whether two more cards are added to the hand
-	comp = assertTrue(pre.handCount[player]+2, post->handCount[player], "2 cards added to hand\n");
+	comp = assertTrue(pre.handCount[player]+2, post->handCount[player], "2 cards should be added to hand\n");
 	result = result && comp;
-
+	if (debug)
+	{
+		printf("%d cards were added to hand\n", post->handCount[player] - pre.handCount[player]);
+		fflush(stdout);
+	}
 	//check whether the total number of cards the player has remains unchanged
 	int preTotal = pre.handCount[player] + pre.deckCount[player] + pre.discardCount[player];
 	int postTotal = post->handCount[player] + post->deckCount[player] + post->discardCount[player];
@@ -82,10 +86,20 @@ int checkAdventurer(int player, struct gameState *post) {
 	int count = post->handCount[player];
 	int card1 = post->hand[player][count-2];
 	int card2 = post->hand[player][count-1];
-	comp = assertTrue(card1 >= copper && card1 <= gold, 1, "first card added is a treasure card\n");
+	comp = assertTrue(card1 >= copper && card1 <= gold, 1, "first card added should be a treasure card\n");
 	result = result && comp;
-	comp = assertTrue(card2 >= copper && card2 <= gold, 1, "second card added is a treasure card\n");
+	if (debug)
+	{
+		printf("First card added to hand is %d\n", card1);
+		fflush(stdout);
+	}
+	comp = assertTrue(card2 >= copper && card2 <= gold, 1, "second card added should be a treasure card\n");
 	result = result && comp;
+	if (debug)
+	{
+		printf("Second card added to hand is %d\n", card2);
+		fflush(stdout);
+	}
 	
 	return result;
 }
@@ -150,12 +164,12 @@ int main () {
 	int seed = 1542;
 	int nTest = 0, nDebug = 0, nSuccess = 0, nFailure = 0;
 	int i, pass;
-	const int MAXTEST = 10;
+	const int MAXTEST = 30, MAXDEBUG = 5;
 //	int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
 
 	struct gameState G;
 
-	printf ("*************************  Random Testing - Acventurer  ***************************\n");
+	printf ("\n\n*************************  Random Testing - Acventurer  ***************************\n");
 	fflush(stdout);
 
 	SelectStream(2);
@@ -164,15 +178,31 @@ int main () {
 	for (i = 0; i < MAXTEST; i++) 
 	{
 		nTest++;
-		generateAdventurerTestCase(&G);
+		generateAdventurerTestCase(&G);	
+		if (debug)
+		{
+			printf("*************** TEST Case #%d **************\n", nDebug);
+			fflush(stdout);
+		}
 		pass = checkAdventurer(G.whoseTurn, &G);
+	
 		if (pass)
 			nSuccess++;
 		else
+		{
 			nFailure++;
+			if (nDebug == 0) //if this is the first failure, then turn on debug
+				debug = 1;
+		}
+		if (debug)
+		{
+			nDebug++;
+			if (nDebug > MAXDEBUG) // if MAXDEBUG messages have been printed out, then turn off debug
+				debug = 0;
+		}
 	}
 
-	printf ("Generated %d cases, valid %d cases, %d passed, %d failed\n", nGenerate, nTest, nSuccess, nFailure);
+	printf ("\n\n SUMMARY: Generated %d cases, %d passed, %d failed\n", nTest, nSuccess, nFailure);
 /*
 	exit(0);
 
