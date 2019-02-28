@@ -1,94 +1,179 @@
 #include "dominion.h"
 #include "dominion_helpers.h"
+#include "rngs.h"
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
-#include "rngs.h"
+#include <stdlib.h>
+#include <math.h>
 
-#define DEBUG 0
 #define NOISY_TEST 1
+
+int debug = 0; //a global variable to indicate whether the debugging message will be printed out
+int nGenerate = 0;
 
 /********************************************************************************************
  * Function: assertTrue
  * Parameters: testResult: an int; expectedResult: an int; info: a string
- * Description: If testResult is the same as expectedResult, then the "TEST SUCCESSFULLY 
+ * Return Value: If testResult is the same as expectedResult, then it returns 1. Otherwise 0.
+ * Description: The test wil print out info only if the global variable debug is nonzero. If 
+ * 		testResult is the same as expectedResult, then the "TEST SUCCESSFULLY 
  * 		COMPLETED" will be displayed on stdout. Otherwise, "TEST FAILED" will be
  * 		printed out. The message is followed by the testing conditions stated in info.
  * *******************************************************************************************/
-void assertTrue(int testResult, int expectedResult, char* info)
+int assertTrue(int testResult, int expectedResult, char* info)
 {
 	if (testResult == expectedResult)
 	{
-		printf("TEST SUCCESSFULLY COMPLETED: "); fflush(stdout);
+		if (debug)
+		{
+			printf("TEST SUCCESSFULLY COMPLETED: "); fflush(stdout);
+			printf(info);
+		}
+		return 1;
 	}
 	else
 	{
-		printf("TEST FAILED: "); fflush(stdout);
+		if (debug)
+		{
+			printf("TEST FAILED: "); fflush(stdout);
+			printf(info);
+		}
+		return 0;
 	}
-	printf(info);
 }
 
-int checkDrawCard(int p, struct gameState *post) {
-  struct gameState pre;
-  memcpy (&pre, post, sizeof(struct gameState));
+/********************************************************************************************
+ * Function: checkAdventurer
+ * Parameters: player: an int, the current player; post: a pointer to a struct gameState
+ * Return Value: If the adventurerAction does what as expected, then it returns 1. 0 otherwise.
+ * Precondition: The post must point to a valid struct gameState for adventurer card. That is, 
+ * 		 there must be at least two treasure card in the deck and discard pile.
+ * Postcondition: the contant of the *post is altered.
+ * Description: If the global variable debug is nonzero, then the test conditions will be printed
+ * 		to stdout. This function test whether two treasure cards are added to the hand,
+ *		and whether the total number of cards in the player's possion remains unchanged.
+ *		If these two criteria are met, then the function returns 1. 0 otherwise.
+ * *******************************************************************************************/
+int checkAdventurer(int player, struct gameState *post) {
+	struct gameState pre;
+	memcpy (&pre, post, sizeof(struct gameState));
 
-  int r;
-  //  printf ("drawCard PRE: p %d HC %d DeC %d DiC %d\n",
-  //	  p, pre.handCount[p], pre.deckCount[p], pre.discardCount[p]);
-    
-  r = drawCard (p, post);
+	int result = 1; //check whether the expected values are the same as test values
+	int comp;
+	int bonus = 0;
+	cardEffect(0,0,0,0,post,0,&bonus); //call the adventurerAction
 
-  //printf ("drawCard POST: p %d HC %d DeC %d DiC %d\n",
-  //      p, post->handCount[p], post->deckCount[p], post->discardCount[p]);
+	//check whether two more cards are added to the hand
+	comp = assertTrue(pre.handCount[player]+2, post->handCount[player], "2 cards added to hand\n");
+	result = result && comp;
 
-  if (pre.deckCount[p] > 0) {
-    pre.handCount[p]++;
-    pre.hand[p][pre.handCount[p]-1] = pre.deck[p][pre.deckCount[p]-1];
-    pre.deckCount[p]--;
-  } else if (pre.discardCount[p] > 0) {
-    memcpy(pre.deck[p], post->deck[p], sizeof(int) * pre.discardCount[p]);
-    memcpy(pre.discard[p], post->discard[p], sizeof(int)*pre.discardCount[p]);
-    pre.hand[p][post->handCount[p]-1] = post->hand[p][post->handCount[p]-1];
-    pre.handCount[p]++;
-    pre.deckCount[p] = pre.discardCount[p]-1;
-    pre.discardCount[p] = 0;
-  }
+	//check whether the total number of cards the player has remains unchanged
+	int preTotal = pre.handCount[player] + pre.deckCount[player] + pre.discardCount[player];
+	int postTotal = post->handCount[player] + post->deckCount[player] + post->discardCount[player];
+	comp = assertTrue(preTotal, postTotal, "Player's total card count should remain unchanged\n");
+	result = result && comp;
+	if (debug)
+	{
+		printf("Expected total card count: %d; Actual total card count: %d\n", preTotal, postTotal);
+		fflush(stdout);
+	}
+	
+	//check whether the two cards added to the hand are treasure cards
+	int count = post->handCount[player];
+	int card1 = post->hand[player][count-2];
+	int card2 = post->hand[player][count-1];
+	comp = assertTrue(card1 >= copper && card1 <= gold, 1, "first card added is a treasure card\n");
+	result = result && comp;
+	comp = assertTrue(card2 >= copper && card2 <= gold, 1, "second card added is a treasure card\n");
+	result = result && comp;
+	
+	return result;
+}
 
-  assert (r == 0);
 
-  assert(memcmp(&pre, post, sizeof(struct gameState)) == 0);
+/********************************************************************************************
+ * Function: generateAdventurerTestCase
+ * Parameters: game: a pointer to a struct gameState
+ * Precondition: game must point to a struct gameState whose memory has been allocated.
+ * Postcondition: the *game has been filled with random data that is suitable for test of
+ * 		  adventurerAction().
+ * Description: This function fills *game with random data. It makes sure that the deckCount,
+ * 		handCount, discardCount, and whoseTurn are all valid numbers. It also makes 
+ * 		sure that the player has at least two treasure cards to draw from
+ * *******************************************************************************************/
+void generateAdventurerTestCase(struct gameState *game) 
+{	
+	int i, j, player, nTreasure, tempCard;
+	while(1)
+	{
+		nGenerate++;
+
+		for (i = 0; i < sizeof(struct gameState); i++) 
+			((char*)game)[i] = floor(Random() * 256);
+		player = floor(Random() * 4);
+		game->whoseTurn = player;
+		game->deckCount[player] = floor(Random() * MAX_DECK);
+		game->discardCount[player] = floor(Random() * MAX_DECK);
+		game->handCount[player] = floor(Random() * MAX_HAND);
+		// make sure the player has at least two cards to draw from
+		if (game->deckCount[player] + game->discardCount[player] < 2)
+			continue;
+
+		nTreasure = 0;
+		// select random cards for the deck
+		for (j=0; j < game->deckCount[player]; j++)
+		{
+			tempCard = (floor(Random() * (treasure_map + 1)));
+			game->deck[player][j] = tempCard;
+			if (tempCard >= copper && tempCard <= gold)
+				nTreasure++;
+
+		}
+		// select random cards for the discard pile
+		for (j=0; j < game->discardCount[player]; j++)
+		{
+			tempCard = (floor(Random() * (treasure_map + 1)));
+			game->discard[player][j] = tempCard;
+			if (tempCard >= copper && tempCard <= gold)
+				nTreasure++;
+		}
+		// make sure the player has at least two treasure cards to draw from
+		if (nTreasure < 2)
+			continue;
+		// if the game is suitable to test adventurerAction(), then break out of the loop.
+		break;
+	}
 }
 
 int main () {
-	int i, n, r, p, deckCount, discardCount, handCount;
-
-	int k[10] = {adventurer, council_room, feast, gardens, mine,
-	       remodel, smithy, village, baron, great_hall};
+//	int i, n, r, p, deckCount, discardCount, handCount;
+	int seed = 1542;
+	int nTest = 0, nDebug = 0, nSuccess = 0, nFailure = 0;
+	int i, pass;
+	const int MAXTEST = 10;
+//	int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
 
 	struct gameState G;
 
-	printf ("Testing drawCard.\n");
-
-	printf ("RANDOM TESTS.\n");
+	printf ("*************************  Random Testing - Acventurer  ***************************\n");
+	fflush(stdout);
 
 	SelectStream(2);
-	PutSeed(3);
+	PutSeed(seed);
 
-	for (n = 0; n < 2000; n++) 
+	for (i = 0; i < MAXTEST; i++) 
 	{
-		for (i = 0; i < sizeof(struct gameState); i++) 
-		{
-			((char*)&G)[i] = floor(Random() * 256);
-		}
-		p = floor(Random() * 2);
-		G.deckCount[p] = floor(Random() * MAX_DECK);
-		G.discardCount[p] = floor(Random() * MAX_DECK);
-		G.handCount[p] = floor(Random() * MAX_HAND);
-		checkDrawCard(p, &G);
+		nTest++;
+		generateAdventurerTestCase(&G);
+		pass = checkAdventurer(G.whoseTurn, &G);
+		if (pass)
+			nSuccess++;
+		else
+			nFailure++;
 	}
 
-	printf ("ALL TESTS OK\n");
-
+	printf ("Generated %d cases, valid %d cases, %d passed, %d failed\n", nGenerate, nTest, nSuccess, nFailure);
+/*
 	exit(0);
 
   printf ("SIMPLE FIXED TESTS.\n");
@@ -109,6 +194,6 @@ int main () {
       }
     }
   }
-
+*/
   return 0;
 }
