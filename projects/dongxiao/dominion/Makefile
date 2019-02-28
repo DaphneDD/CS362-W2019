@@ -36,6 +36,10 @@ randomtestsmithy.o: randomtestsmithy.c dominion.h dominion_helpers.h rngs.h
 	gcc -c randomtestsmithy.c -g $(CFLAGS)
 randomtestsmithy: randomtestsmithy.o dominion.o rngs.o
 	gcc -o randomtestsmithy -g randomtestsmithy.o dominion.o rngs.o $(CFLAGS)
+randomtestvillage.o: randomtestvillage.c dominion.h dominion_helpers.h rngs.h
+	gcc -c randomtestvillage.c -g $(CFLAGS)
+randomtestvillage: randomtestvillage.o dominion.o rngs.o
+	gcc -o randomtestvillage -g randomtestvillage.o dominion.o rngs.o $(CFLAGS)
 
 
 player: player.c interface.o
