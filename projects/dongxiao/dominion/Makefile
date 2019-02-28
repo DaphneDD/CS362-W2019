@@ -28,19 +28,28 @@ runtests: testDrawCard
 	./testDrawCard &> unittestresult.out
 	gcov dominion.c >> unittestresult.out
 	cat dominion.c.gcov >> unittestresult.out
+
 randomtestadventurer.o: randomtestadventurer.c dominion.h dominion_helpers.h rngs.h
 	gcc -c randomtestadventurer.c -g $(CFLAGS)
-randomtestadventurer: randomtestadventurer.o dominion.o rngs.o
-	gcc -o randomtestadventurer -g randomtestadventurer.o dominion.o rngs.o $(CFLAGS)
-randomtestsmithy.o: randomtestsmithy.c dominion.h dominion_helpers.h rngs.h
-	gcc -c randomtestsmithy.c -g $(CFLAGS)
-randomtestsmithy: randomtestsmithy.o dominion.o rngs.o
-	gcc -o randomtestsmithy -g randomtestsmithy.o dominion.o rngs.o $(CFLAGS)
-randomtestvillage.o: randomtestvillage.c dominion.h dominion_helpers.h rngs.h
-	gcc -c randomtestvillage.c -g $(CFLAGS)
-randomtestvillage: randomtestvillage.o dominion.o rngs.o
-	gcc -o randomtestvillage -g randomtestvillage.o dominion.o rngs.o $(CFLAGS)
-
+randomtestadventurer.out: randomtestadventurer.o dominion.o rngs.o
+	gcc -o randomtestadventurer.out -g randomtestadventurer.o dominion.o rngs.o $(CFLAGS)
+randomtestcard1.o: randomtestcard1.c dominion.h dominion_helpers.h rngs.h
+	gcc -c randomtestcard1.c -g $(CFLAGS)
+randomtestcard1.out: randomtestcard1.o dominion.o rngs.o
+	gcc -o randomtestcard1.out -g randomtestcard1.o dominion.o rngs.o $(CFLAGS)
+randomtestcard2.o: randomtestcard2.c dominion.h dominion_helpers.h rngs.h
+	gcc -c randomtestcard2.c -g $(CFLAGS)
+randomtestcard2.out: randomtestcard2.o dominion.o rngs.o
+	gcc -o randomtestcard2.out -g randomtestcard2.o dominion.o rngs.o $(CFLAGS)
+randomTestAll: randomtestadventurer.out randomtestcard1.out randomtestcard2.out
+	make randomtestadventurer.out
+	make randomtestcard1.out
+	make randomtestcard2.out
+	time ./randomtestadventurer.out 1>randomtestresults.out 
+	time ./randomtestcard1.out 1>>randomtestresults.out 
+	time ./randomtestcard2.out 1>>randomtestresults.out
+	gcov -b dominion.c
+	cat dominion.c.gcov 1>>randomtestresults.out
 
 player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
@@ -48,4 +57,4 @@ player: player.c interface.o
 all: playdom player 
 
 clean:
-	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe randomtestadventurer randomtestsmithy randomtestvillage
+	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe 
