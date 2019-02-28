@@ -128,7 +128,7 @@ void generateAdventurerTestCase(struct gameState *game)
 		game->whoseTurn = player;
 		game->deckCount[player] = floor(Random() * MAX_DECK);
 		game->discardCount[player] = floor(Random() * MAX_DECK);
-		game->handCount[player] = floor(Random() * MAX_HAND);
+		game->handCount[player] = floor(Random() * (MAX_HAND-2));
 		// make sure the player has at least two cards to draw from
 		if (game->deckCount[player] + game->discardCount[player] < 2)
 			continue;
