@@ -132,7 +132,7 @@ int main () {
 	int seed = 1542;
 	int nTest = 0, nDebug = 0, nSuccess = 0, nFailure = 0;
 	int i, pass;
-	const int MAXTEST = 30, MAXDEBUG = 5;
+	const int MAXTEST = 2000, MAXDEBUG = 5;
 
 	struct gameState G;
 

@@ -44,7 +44,7 @@ int assertTrue(int testResult, int expectedResult, char* info)
 	}
 }
 
-/********************************************************************************************
+/*************************************************************************************************
  * Function: checkVillage
  * Parameters: player: an int, the current player; post: a pointer to a struct gameState; handPos,
  * 	       an int, the position of the village card in the hand
@@ -56,10 +56,9 @@ int assertTrue(int testResult, int expectedResult, char* info)
  * Description: If the global variable debug is nonzero, then the test conditions will be printed
  * 		to stdout. This function test whether one card is added to the hand, whether the 
  * 		total number of cards in the player's posession remains unchanged, whether two
- * 		more actions are added to the player, whether the village card is moved to the 
- * 		played pile, and whether other memory remains unchanged. If these criteria are met, 
- * 		then the function returns 1. 0 otherwise.
- * *******************************************************************************************/
+ * 		more actions are added to the player, and whether the village card is moved to the 
+ * 		played pile. If these criteria are met, then the function returns 1. 0 otherwise.
+ * ************************************************************************************************/
 int checkVillage(int player, struct gameState *post, int handPos) {
 	struct gameState pre;
 	memcpy (&pre, post, sizeof(struct gameState));
@@ -129,6 +128,7 @@ int generateVillageTestCase(struct gameState *game)
 		game->deckCount[player] = floor(Random() * MAX_DECK);
 		game->discardCount[player] = floor(Random() * MAX_DECK);
 		game->handCount[player] = floor(Random() * MAX_HAND);
+		game->playedCardCount = floor(Random() * MAX_HAND);
 		// make sure the player has at least one card to draw from
 		if (game->deckCount[player] + game->discardCount[player] < 1)
 			continue;
@@ -157,7 +157,7 @@ int main () {
 	int seed = 1542;
 	int nTest = 0, nDebug = 0, nSuccess = 0, nFailure = 0;
 	int i, pass, handPos;
-	const int MAXTEST = 30, MAXDEBUG = 5;
+	const int MAXTEST = 2000, MAXDEBUG = 5;
 
 	struct gameState G;
 
