@@ -44,7 +44,7 @@ int assertTrue(int testResult, int expectedResult, char* info)
 	}
 }
 
-/********************************************************************************************
+/*************************************************************************************************
  * Function: checkVillage
  * Parameters: player: an int, the current player; post: a pointer to a struct gameState; handPos,
  * 	       an int, the position of the village card in the hand
@@ -56,10 +56,9 @@ int assertTrue(int testResult, int expectedResult, char* info)
  * Description: If the global variable debug is nonzero, then the test conditions will be printed
  * 		to stdout. This function test whether one card is added to the hand, whether the 
  * 		total number of cards in the player's posession remains unchanged, whether two
- * 		more actions are added to the player, whether the village card is moved to the 
- * 		played pile, and whether other memory remains unchanged. If these criteria are met, 
- * 		then the function returns 1. 0 otherwise.
- * *******************************************************************************************/
+ * 		more actions are added to the player, and whether the village card is moved to the 
+ * 		played pile. If these criteria are met, then the function returns 1. 0 otherwise.
+ * ************************************************************************************************/
 int checkVillage(int player, struct gameState *post, int handPos) {
 	struct gameState pre;
 	memcpy (&pre, post, sizeof(struct gameState));
@@ -97,7 +96,7 @@ int checkVillage(int player, struct gameState *post, int handPos) {
 	}	
 
 	//check whether two actions were added
-	comp = asswertTrue(pre.numActions + 2, post->numActions, "2 actions should be added\n");
+	comp = assertTrue(pre.numActions + 2, post->numActions, "2 actions should be added\n");
 	result = result && comp;
 
 	return result;
@@ -105,18 +104,19 @@ int checkVillage(int player, struct gameState *post, int handPos) {
 
 
 /********************************************************************************************
- * Function: generateSmithyTestCase
+ * Function: generateVillageTestCase
  * Parameters: game: a pointer to a struct gameState
+ * Return Value: The hand position of the village card
  * Precondition: game must point to a struct gameState whose memory has been allocated.
  * Postcondition: the *game has been filled with random data that is suitable for test of
- * 		  smithyAction().
+ * 		  the implementation of village.
  * Description: This function fills *game with random data. It makes sure that the deckCount,
  * 		handCount, discardCount, and whoseTurn are all valid numbers. It also makes 
- * 		sure that the player has at least three cards to draw from
+ * 		sure that the player has at least one card to draw from
  * *******************************************************************************************/
-void generateSmithyTestCase(struct gameState *game) 
+int generateVillageTestCase(struct gameState *game) 
 {	
-	int i, j, player;
+	int i, j, player, handPos;
 	while(1)
 	{
 		nGenerate++;
@@ -127,9 +127,10 @@ void generateSmithyTestCase(struct gameState *game)
 		game->whoseTurn = player;
 		game->deckCount[player] = floor(Random() * MAX_DECK);
 		game->discardCount[player] = floor(Random() * MAX_DECK);
-		game->handCount[player] = floor(Random() * MAX_HAND);
-		// make sure the player has at least three cards to draw from
-		if (game->deckCount[player] + game->discardCount[player] < 3)
+		game->handCount[player] = floor(Random() * (MAX_HAND-1)) + 1;
+		game->playedCardCount = floor(Random() * (MAX_DECK - 1));
+		// make sure the player has at least one card to draw from
+		if (game->deckCount[player] + game->discardCount[player] < 1)
 			continue;
 
 		// select random cards for the deck
@@ -138,21 +139,29 @@ void generateSmithyTestCase(struct gameState *game)
 		// select random cards for the discard pile
 		for (j=0; j < game->discardCount[player]; j++)
 			game->discard[player][j] = (floor(Random() * (treasure_map + 1)));
+		// select random cards for the hand
+		for (j=0; j < game->handCount[player]; j++)
+			game->hand[player][j] = (floor(Random() * (treasure_map + 1)));
+		// select handPos
+		handPos = floor(Random() * game->handCount[player]);
+		game->hand[player][handPos] = village;
+
 		// the game is suitable to test smithyAction(). break out of the loop.
 		break;
 	}
+	return handPos;
 }
 
 int main () {
 //	int i, n, r, p, deckCount, discardCount, handCount;
 	int seed = 1542;
 	int nTest = 0, nDebug = 0, nSuccess = 0, nFailure = 0;
-	int i, pass;
-	const int MAXTEST = 30, MAXDEBUG = 5;
+	int i, pass, handPos;
+	const int MAXTEST = 10000, MAXDEBUG = 5;
 
 	struct gameState G;
 
-	printf ("\n\n*************************  Random Testing - Smithy  ***************************\n");
+	printf ("\n\n*************************  Random Testing - Village  ***************************\n");
 	fflush(stdout);
 
 	SelectStream(2);
@@ -161,13 +170,13 @@ int main () {
 	for (i = 0; i < MAXTEST; i++) 
 	{
 		nTest++;
-		generateSmithyTestCase(&G);	
+		handPos = generateVillageTestCase(&G);	
 		if (debug)
 		{
 			printf("*************** TEST Case #%d **************\n", nDebug);
 			fflush(stdout);
 		}
-		pass = checkSmithy(G.whoseTurn, &G);
+		pass = checkVillage(G.whoseTurn, &G, handPos);
 	
 		if (pass)
 			nSuccess++;
