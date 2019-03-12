@@ -731,11 +731,11 @@ branch  1 never executed
     #####:  522:  return 0;
         -:  523:}
         -:  524:
-function drawCard called 221051 returned 100% blocks executed 92%
-   221051:  525:int drawCard(int player, struct gameState *state)
+function drawCard called 220978 returned 100% blocks executed 92%
+   220978:  525:int drawCard(int player, struct gameState *state)
         -:  526:{	int count;
         -:  527:  int deckCounter;
-   221051:  528:  if (state->deckCount[player] <= 0){//Deck is empty
+   220978:  528:  if (state->deckCount[player] <= 0){//Deck is empty
 branch  0 taken 1% (fallthrough)
 branch  1 taken 99%
         -:  529:    
@@ -782,19 +782,19 @@ branch  1 taken 100%
         -:  565:  }
         -:  566:
         -:  567:  else{
-   220609:  568:    int count = state->handCount[player];//Get current hand count for player
+   220536:  568:    int count = state->handCount[player];//Get current hand count for player
         -:  569:    int deckCounter;
         -:  570:    if (DEBUG){//Debug statements
         -:  571:      printf("Current hand count: %d\n", count);
         -:  572:    }
         -:  573:
-   220609:  574:    deckCounter = state->deckCount[player];//Create holder for the deck count
-   220609:  575:    state->hand[player][count] = state->deck[player][deckCounter - 1];//Add card to the hand
-   220609:  576:    state->deckCount[player]--;
-   220609:  577:    state->handCount[player]++;//Increment hand count
+   220536:  574:    deckCounter = state->deckCount[player];//Create holder for the deck count
+   220536:  575:    state->hand[player][count] = state->deck[player][deckCounter - 1];//Add card to the hand
+   220536:  576:    state->deckCount[player]--;
+   220536:  577:    state->handCount[player]++;//Increment hand count
         -:  578:  }
         -:  579:
-   221051:  580:  return 0;
+   220978:  580:  return 0;
         -:  581:}
         -:  582:
 function getCost called 0 returned 0% blocks executed 0%
@@ -1715,19 +1715,19 @@ function adventurerAction called 10000 returned 100% blocks executed 100%
     10000: 1228:	int drawntreasure = 0;
         -: 1229:	int temphand[MAX_HAND];
     10000: 1230:	int z = 0; //this is the counter for the temp hand
-   201051: 1231:	while(drawntreasure<2){
+   200978: 1231:	while(drawntreasure<2){
 branch  0 taken 95%
 branch  1 taken 5% (fallthrough)
-   181051: 1232:		if (state->deckCount[currentPlayer] <1){//if the deck is empty we need to shuffle discard and add to deck
+   180978: 1232:		if (state->deckCount[currentPlayer] <1){//if the deck is empty we need to shuffle discard and add to deck
 branch  0 taken 1% (fallthrough)
 branch  1 taken 99%
       358: 1233:			shuffle(currentPlayer, state);
 call    0 returned 100%
         -: 1234:		}
-   181051: 1235:		drawCard(currentPlayer, state);
+   180978: 1235:		drawCard(currentPlayer, state);
 call    0 returned 100%
-   181051: 1236:		cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
-   181051: 1237:		if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
+   180978: 1236:		cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
+   180978: 1237:		if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
 branch  0 taken 96% (fallthrough)
 branch  1 taken 4%
 branch  2 taken 96% (fallthrough)
@@ -1736,18 +1736,18 @@ branch  4 taken 4% (fallthrough)
 branch  5 taken 96%
     20000: 1238:			drawntreasure++;
         -: 1239:		else{
-   161051: 1240:			temphand[z]=cardDrawn;
+   160978: 1240:			temphand[z]=cardDrawn;
         -: 1241:			/********************** BUG ***************************************/
         -: 1242:			/* Do not remove the top card. So the player have two copies of cardDrawn */
         -: 1243:			//state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
-   161051: 1244:			z++;
+   160978: 1244:			z++;
         -: 1245:		}
         -: 1246:      }
-   181051: 1247:      while(z-1>=0){
+   180978: 1247:      while(z-1>=0){
 branch  0 taken 94%
 branch  1 taken 6% (fallthrough)
-   161051: 1248:      		state->discard[currentPlayer][state->discardCount[currentPlayer]++]=temphand[z-1]; // discard all cards in play that have been drawn
-   161051: 1249:		z=z-1;
+   160978: 1248:      		state->discard[currentPlayer][state->discardCount[currentPlayer]++]=temphand[z-1]; // discard all cards in play that have been drawn
+   160978: 1249:		z=z-1;
         -: 1250:      }
     10000: 1251:      return 0;
         -: 1252:}	
