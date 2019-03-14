@@ -84,8 +84,6 @@ test_cardtest4: cardtest4
 unittestresults: 
 	make test_cardtest1 1> unittestresults.out
 	make test_cardtest2 1>> unittestresults.out
-	make test_cardtest3 1>> unittestresults.out
-	make test_cardtest4 1>> unittestresults.out
 	cat dominion.c.gcov 1>> unittestresults.out
 	
 randomtestadventurer.o: randomtestadventurer.c dominion.h dominion_helpers.h rngs.h
@@ -103,10 +101,8 @@ randomtestcard2.out: randomtestcard2.o dominion.o rngs.o
 randomTestAll: randomtestadventurer.out randomtestcard1.out randomtestcard2.out
 	make randomtestadventurer.out
 	make randomtestcard1.out
-	make randomtestcard2.out
 	time ./randomtestadventurer.out 1>randomtestresults.out 
 	time ./randomtestcard1.out 1>>randomtestresults.out 
-	time ./randomtestcard2.out 1>>randomtestresults.out
 	gcov -b dominion.c
 	cat dominion.c.gcov 1>>randomtestresults.out
 

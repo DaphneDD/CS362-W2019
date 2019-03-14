@@ -37,7 +37,7 @@ void assertTrue(int testResult, int expectedResult, char* info)
 int main()
 {
 	int numPlayers = 2;
-	int seed = 0;
+	int seed = 15;
 	int k[10] = {adventurer, feast, gardens, mine, smithy, village, baron, steward, outpost, treasure_map};
 	struct gameState G,preG;
 	int handPos = 0;
