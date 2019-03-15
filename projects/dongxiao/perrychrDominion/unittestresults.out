@@ -1,7 +1,7 @@
 make[1]: Entering directory `/nfs/stak/users/dongxiao/CS362/CS362-W2019/projects/dongxiao/perrychrDominion'
-gcc -c rngs.c -g  -Wall -fpic -coverage -lm -std=c99
-gcc -c dominion.c -g  -Wall -fpic -coverage -lm -std=c99
-gcc -o cardtest1 -g cardtest1.c dominion.o rngs.o -Wall -fpic -coverage -lm -std=c99
+gcc -c rngs.c -g  -Wall -fpic -coverage -lm -std=c99 -g
+gcc -c dominion.c -g  -Wall -fpic -coverage -lm -std=c99 -g
+gcc -o cardtest1 -g cardtest1.c dominion.o rngs.o -Wall -fpic -coverage -lm -std=c99 -g
 ./cardtest1
 ----------------------- Testing Adventurer ----------------------
 TEST FAILED: 2 cards added to hand
@@ -64,7 +64,7 @@ Creating 'dominion.c.gcov'
 
 make[1]: Leaving directory `/nfs/stak/users/dongxiao/CS362/CS362-W2019/projects/dongxiao/perrychrDominion'
 make[1]: Entering directory `/nfs/stak/users/dongxiao/CS362/CS362-W2019/projects/dongxiao/perrychrDominion'
-gcc -o cardtest2 -g cardtest2.c dominion.o rngs.o -Wall -fpic -coverage -lm -std=c99
+gcc -o cardtest2 -g cardtest2.c dominion.o rngs.o -Wall -fpic -coverage -lm -std=c99 -g
 ./cardtest2
 ----------------------- Testing Smithy ----------------------
 TEST FAILED: 2 cards added to hand
