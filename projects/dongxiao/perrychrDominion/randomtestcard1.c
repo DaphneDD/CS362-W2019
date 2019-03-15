@@ -63,7 +63,7 @@ int checkSmithy(int player, struct gameState *post, int handPos) {
 	int result = 1; //check whether the expected values are the same as test values
 	int comp;
 	int bonus = 0;
-	cardEffect(smithy,0,0,0,post,0,&bonus); //call the smithyAction through cardEffect
+	cardEffect(smithy,0,0,0,post,handPos,&bonus); //call the smithyAction through cardEffect
 
 	//check whether two more cards are added to the hand
 	comp = assertTrue(pre.handCount[player]+2, post->handCount[player], "2 cards should be added to hand\n");
