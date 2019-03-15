@@ -88,7 +88,7 @@ int checkSmithy(int player, struct gameState *post, int handPos) {
 	//check whether the smithy card is added to the played card pile.
 	comp = assertTrue(post->playedCardCount, pre.playedCardCount + 1, "1 card should be added to the played pile\n");
 	result = result && comp;
-	comp = assertTrue(post->playedCards[pre.playedCardCount], smithy, "The new played card should be village\n");
+	comp = assertTrue(post->playedCards[pre.playedCardCount], smithy, "The new played card should be smithy\n");
 	result = result && comp;
 	
 	return result;

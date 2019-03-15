@@ -84,8 +84,9 @@ int checkAdventurer(int player, struct gameState *post) {
 	
 	//check whether the two cards added to the hand are treasure cards
 	int count = post->handCount[player];
-	int card1 = post->hand[player][count-2];
-	int card2 = post->hand[player][count-1];
+	int card1 = post->hand[player][count-3];
+	int card2 = post->hand[player][count-2];
+	int card3 = post->hand[player][count-1];
 	comp = assertTrue(card1 >= copper && card1 <= gold, 1, "first card added should be a treasure card\n");
 	result = result && comp;
 	if (debug)
@@ -98,6 +99,13 @@ int checkAdventurer(int player, struct gameState *post) {
 	if (debug)
 	{
 		printf("Second card added to hand is %d\n", card2);
+		fflush(stdout);
+	}
+	comp = assertTrue(card3 >= copper && card3 <= gold, 1, "third card added should be a treasure card\n");
+	result = result && comp;
+	if (debug)
+	{
+		printf("Third card added to hand is %d\n", card3);
 		fflush(stdout);
 	}
 	
@@ -113,7 +121,7 @@ int checkAdventurer(int player, struct gameState *post) {
  * 		  adventurerAction().
  * Description: This function fills *game with random data. It makes sure that the deckCount,
  * 		handCount, discardCount, and whoseTurn are all valid numbers. It also makes 
- * 		sure that the player has at least two treasure cards to draw from
+ * 		sure that the player has at least three treasure cards to draw from
  * *******************************************************************************************/
 void generateAdventurerTestCase(struct gameState *game) 
 {	
@@ -129,8 +137,8 @@ void generateAdventurerTestCase(struct gameState *game)
 		game->deckCount[player] = floor(Random() * MAX_DECK);
 		game->discardCount[player] = floor(Random() * MAX_DECK);
 		game->handCount[player] = floor(Random() * (MAX_HAND-2));
-		// make sure the player has at least two cards to draw from
-		if (game->deckCount[player] + game->discardCount[player] < 2)
+		// make sure the player has at least three cards to draw from
+		if (game->deckCount[player] + game->discardCount[player] < 3)
 			continue;
 
 		nTreasure = 0;
@@ -151,8 +159,8 @@ void generateAdventurerTestCase(struct gameState *game)
 			if (tempCard >= copper && tempCard <= gold)
 				nTreasure++;
 		}
-		// make sure the player has at least two treasure cards to draw from
-		if (nTreasure < 2)
+		// make sure the player has at least three treasure cards to draw from
+		if (nTreasure < 3)
 			continue;
 		// if the game is suitable to test adventurerAction(), then break out of the loop.
 		break;

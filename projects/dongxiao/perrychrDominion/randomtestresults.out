@@ -59,14 +59,14 @@ TEST FAILED: 2 cards should be added to hand
 TEST SUCCESSFULLY COMPLETED: Player's total card count should remain unchanged
 Expected total card count: 408; Actual total card count: 408
 TEST SUCCESSFULLY COMPLETED: 1 card should be added to the played pile
-TEST FAILED: The new played card should be village
+TEST FAILED: The new played card should be Village
 *************** TEST Case #2 **************
 TEST FAILED: 2 cards should be added to hand
 3 cards were added to hand
 TEST SUCCESSFULLY COMPLETED: Player's total card count should remain unchanged
 Expected total card count: 1083; Actual total card count: 1083
 TEST SUCCESSFULLY COMPLETED: 1 card should be added to the played pile
-TEST FAILED: The new played card should be village
+TEST FAILED: The new played card should be Village
 *************** TEST Case #3 **************
 TEST FAILED: 2 cards should be added to hand
 3 cards were added to hand
